@@ -77,6 +77,16 @@ my_flask_app/
     ```
     docker run -p 9090:8080 gcp-flask-app
     ```
+#### Screenshots:
+
+![image](https://github.com/user-attachments/assets/00667e14-eb0f-4f35-b4cb-2018be15b842)
+
+---
+    
+![image](https://github.com/user-attachments/assets/f41bf8f8-dda7-41f8-a801-7d62230d256f)
+
+---
+
 ### 3.2 Push Docker Image to Google Container Registry (GCR)
  1. Tagged the Docker image:
     ```
@@ -86,7 +96,7 @@ my_flask_app/
     ```
     docker push gcr.io/cain-samantha-hha504/gcp-flask-app
     ```
-### 3.3
+### 3.3 Deploy to Google Cloud Run
  1. Deployed the containerized application:
     ```
     gcloud run deploy gcp-flask-app \
@@ -97,6 +107,14 @@ my_flask_app/
     ```
  2. Verified deployment using the provided URL:
      Deployed URL: https://gcp-flask-app-829081573209.us-central1.run.app
+
+#### Screenshots: 
+
+![image](https://github.com/user-attachments/assets/d67db1cd-f4de-4623-baa6-f5c43b9bfb7f)
+
+---
+![image](https://github.com/user-attachments/assets/d6964373-f32a-4482-b580-e9c1e401f683)
+
 ---
 
 ## 4. Reflection
