@@ -1,80 +1,109 @@
-# 504_Assignment_Containers
+# HHA504 Assignment: Deploying and Managing Containers
 
-This project involves containerizing a Flask application using Docker and deploying it to **GCP Cloud Run**. Below are the details of the process, including the Dockerfile, deployment steps, screenshots, and reflections.
+## Overview
+This project demonstrates how to containerize a Python Flask application, deploy it to Google Cloud Run, and reflect on the process.
 
 ---
 
-## **1. Dockerfile**
-The Dockerfile used to containerize the Flask application is as follows:
-```dockerfile
-# Use a lightweight Python image as the base
-FROM python:3.11-alpine
+## 1. Creating the Flask Application Using Google Cloud Shell
 
-# Set the working directory
+### 1.1 Writing the Application Code
+ The following code was saved in `app.py`:
+
+```python
+from flask import Flask, url_for
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    image_url = url_for('static', filename='images/cat.jpg')
+    print(f"Image URL: {image_url}")
+    return f"""
+    <html>
+        <head><title>Flask App with Image</title></head>
+        <body>
+            <h1>Welcome to My Flask App!</h1>
+            <img src="{image_url}" alt="Example Image" style="width:300px;height:auto;">
+        </body>
+    </html>
+    """
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
+```
+ 
+## 2. Dockerfile
+
+```dockerfile
+# Use the official Python image
+FROM python:3.9-slim
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application files into the container
+# Copy all application files into the container
 COPY . /app
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Flask
+RUN pip install flask
 
-# Expose the port the app runs on
+# Expose port 8080 for Flask
 EXPOSE 8080
 
-# Define the command to run the app
+# Run the Flask app
 CMD ["python", "app.py"]
 ```
-
 ---
 
-## **2. Deployment Screenshots**
+## 3. Deployment Process
 
-### **2.1 GCP Cloud Run Deployment**
-- **Building the Docker Image in Cloud Shell**:
+### 3.1 Steps to Containerize the Application
+ 1. Created a simple Python Flask application with the following structure:
 
-- **Pushing the Docker Image to Container Registry**:
- 
-- **Deploying to Cloud Run**:
-
-
-
-## **3. Deployed Application URL**: [GCP App Link](https://your-cloud-run-url)
-
-
----
-
-## **4. Reflection**
-
-### **Challenges**
-1. **Dockerfile Configuration**:
-   - Issue: Initial Dockerfile failed due to missing dependencies.
-   - Solution: Ensured `requirements.txt` was up-to-date and included all necessary libraries.
-
-2. **GCP Deployment**:
-   - Issue: Error while pushing the Docker image to Container Registry.
-   - Solution: Used Google Cloud Shell for authentication and proper `gcloud` commands.
-
-### **Lessons Learned**
-1. **Docker Fundamentals**: Writing an effective Dockerfile is key to a successful deployment.
-2. **Cloud-Specific Features**: GCP has unique configurations that require careful attention to detail.
-3. **Automation Tools**: Using tools like Google Cloud Shell streamlined the process significantly.
-
----
-
-## **5. Repository Structure**
-```
-flask_app/
+```my_flask_app
+my_flask_app/
 ├── app.py
-├── requirements.txt
 ├── Dockerfile
-├── README.md
-└── screenshots/
-    ├── gcp_build_image_screenshot.png
-    ├── gcp_push_image_screenshot.png
-    └── gcp_deploy_screenshot.png
+└── static/
+    └── images/
+        └── cat.jpg
 ```
-
+ 2. Built the Docker image locally:
+    ```
+    docker build -t gcp-flask-app .
+    ```
+ 3. Tested the application locally:
+    ```
+    docker run -p 9090:8080 gcp-flask-app
+    ```
+### 3.2 Push Docker Image to Google Container Registry (GCR)
+ 1. Tagged the Docker image:
+    ```
+    docker tag gcp-flask-app gcr.io/cain-samantha-hha504/gcp-flask-app
+    ```
+ 2. Pushed the image to GCR:
+    ```
+    docker push gcr.io/cain-samantha-hha504/gcp-flask-app
+    ```
+### 3.3
+ 1. Deployed the containerized application:
+    ```
+    gcloud run deploy gcp-flask-app \
+      --image gcr.io/cain-samantha-hha504/gcp-flask-app \
+      --platform managed \
+      --region us-central1 \
+      --allow-unauthenticated
+    ```
+ 2. Verified deployment using the provided URL:
+     Deployed URL: https://gcp-flask-app-829081573209.us-central1.run.app
 ---
 
-Let me know if you need help adjusting this further!
+## 4. Reflection
+
+### Challenges Faced:
+ - Port Binding Error: Encountered a port conflict when running the Docker container locally. Resolved by using a different port (9090).
+ - Project Configuration Error: Initially, Cloud Run deployment failed due to the project not being specified in gcloud. Fixed by setting the project using gcloud config set project.
+
+
+
